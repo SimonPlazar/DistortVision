@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time
 
 def compress_and_overlay(image, mask, quality):
     # Make a copy of the original image
@@ -40,7 +41,9 @@ if __name__ == "__main__":
     mask[y:y + h, x:x + w] = 255
 
     # Call the compress_and_overlay function with the image and mask
-    final_image = compress_and_overlay(image, mask, 95)
+    start = time.time()
+    final_image = compress_and_overlay(image, mask, 5)
+    print("Time taken: {:.2f} seconds".format(time.time() - start))
 
     # Display the final image
     cv2.imshow('Final Image', final_image)
@@ -48,4 +51,4 @@ if __name__ == "__main__":
     cv2.destroyAllWindows()
 
     # Save the final image
-    cv2.imwrite('final_image_path.jpg', final_image)
+    cv2.imwrite('output/final_image_path.jpg', final_image)
