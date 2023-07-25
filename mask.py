@@ -1,43 +1,51 @@
 import cv2
 import numpy as np
 
-# Read the image
-image = cv2.imread('screenshot.png')
-image_copy = image.copy()  # make a copy of the original image
+def compress_and_overlay(image, mask, quality):
+    # Make a copy of the original image
+    image_copy = image.copy()
 
-# Get image shape
-h, w = image.shape[:2]
+    # Create a mask slightly larger than the input mask
+    dilated_mask = cv2.dilate(mask, None, iterations=5)
 
-# Create zero filled binary masks
-mask1 = np.zeros((h, w), np.uint8)
-mask2 = np.zeros((h, w), np.uint8)
+    # Extract the area defined by the input mask from the original image
+    extracted = cv2.bitwise_and(image, image, mask=dilated_mask)
 
-# Define center and radii of the circles
-center = (w // 2, h // 2)
-radius1 = min(w, h) // 4
-radius2 = radius1 + 5  # make this mask slightly larger
+    # Compress the extracted area
+    _, compressed_image = cv2.imencode(".jpg", extracted, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
+    # Decode the compressed image
+    extracted = cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
 
-# Draw filled circles in the masks
-cv2.circle(mask1, center, radius1, (255), thickness=-1)
-cv2.circle(mask2, center, radius2, (255), thickness=-1)
+    # Replace the pixels in the original image with those from 'extracted',
+    # but only for the pixels within the input mask.
+    image_copy[np.where(mask == 255)] = extracted[np.where(mask == 255)]
 
-# Extract the circular area from the original image using the larger mask
-extracted = cv2.bitwise_and(image, image, mask=mask2)
+    return image_copy
 
-# At this point, you can manipulate 'extracted' however you like.
-# Once you're done, you can put it back to the original image.
-_, compressed_image = cv2.imencode(".jpg", extracted, [int(cv2.IMWRITE_JPEG_QUALITY), 5])
-# Decode the compressed image
-extracted = cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
 
-# Replace the pixels in the original image with those from 'extracted',
-# but only for the pixels within the smaller mask.
-image_copy[np.where(mask1 == 255)] = extracted[np.where(mask1 == 255)]
+# Example usage:
+if __name__ == "__main__":
+    # Read the image
+    image = cv2.imread('input/screenshot.png')
 
-# Display final image
-cv2.imshow('Final Image', image_copy)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    # Create a binary mask (you can generate masks for any shape you need)
+    mask = np.zeros((image.shape[0], image.shape[1]), np.uint8)
 
-# Save final image
-cv2.imwrite('final_image_path.jpg', image_copy)
+    # Example: create a circular mask
+    # center = (image.shape[1] // 2, image.shape[0] // 2)
+    # radius = min(image.shape[1], image.shape[0]) // 4
+    # cv2.circle(mask, center, radius, (255), thickness=-1)
+
+    x, y, w, h = image.shape[1] // 4, image.shape[0] // 4, image.shape[1] // 2, image.shape[0] // 2
+    mask[y:y + h, x:x + w] = 255
+
+    # Call the compress_and_overlay function with the image and mask
+    final_image = compress_and_overlay(image, mask, 95)
+
+    # Display the final image
+    cv2.imshow('Final Image', final_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    # Save the final image
+    cv2.imwrite('final_image_path.jpg', final_image)
