@@ -238,3 +238,5 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 /output/
 /input/
+/ssd_mobilenet_v2_320x320_coco17_tpu-8/
+/dnn/
