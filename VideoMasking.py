@@ -33,7 +33,7 @@ def compress_and_overlay(image, mask, quality):
 
 if __name__ == "__main__":
     # Load the model
-    model = YOLO("dnn\\yolov8n-seg.pt")
+    model = YOLO("dnn\\yolov8x-seg.pt")
 
     # Create the video capture object (replace '0' with the appropriate video source)
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
