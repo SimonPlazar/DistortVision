@@ -2,9 +2,17 @@ import cv2
 import numpy as np
 import time
 
+from ultralytics import YOLO
+
+
 def compress_and_overlay(image, mask, quality):
     # Create a mask slightly larger than the input mask
     dilated_mask = cv2.dilate(mask, None, iterations=5)
+
+    print(dilated_mask.shape)
+    print(dilated_mask.dtype)
+    print(image.shape)
+    print(image.dtype)
 
     # Extract the area defined by the input mask from the original image
     extracted = cv2.bitwise_and(image, image, mask=dilated_mask)
@@ -22,6 +30,9 @@ def compress_and_overlay(image, mask, quality):
 
 
 if __name__ == "__main__":
+    # Load the model
+    model = YOLO("dnn\\yolov8n-seg.pt")
+
     # Create the video capture object (replace '0' with the appropriate video source)
     cap = cv2.VideoCapture(0)
 
@@ -32,9 +43,9 @@ if __name__ == "__main__":
     print(fps_num)
 
     # Create a binary square mask (you can change this according to your needs)
-    mask = np.zeros((height, width), np.uint8)
-    x, y, w, h = width // 4, height // 4, width // 2, height // 2
-    mask[y:y + h, x:x + w] = 255
+    # mask = np.zeros((height, width), np.uint8)
+    # x, y, w, h = width // 4, height // 4, width // 2, height // 2
+    # mask[y:y + h, x:x + w] = 255
 
     start_time_fps = time.time()
     frame_counter = 0
@@ -48,6 +59,10 @@ if __name__ == "__main__":
 
         # Measure the processing time of the function
         start_time = time.time()
+
+        results = model.predict(source=frame, conf=0.59, classes=0, verbose=False)[0].masks
+        mask = np.repeat(results.data[0].numpy().reshape((height, width, 1)), 3, axis=-1).astype(np.uint8)
+
         frame = compress_and_overlay(frame, mask, 5)
         print("Time taken: {:.2f} seconds".format(time.time() - start_time))
 
