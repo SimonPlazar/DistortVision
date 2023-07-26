@@ -1,21 +1,35 @@
-import math
-import time
 import cv2
 import numpy as np
-from ultralytics import YOLO
+import time
+from VideoCapture import Device
 
-# Load the model
-model = YOLO("dnn\\yolov8s-seg.pt")
+cam = Device()
+cam.saveSnapshot('image.jpg')
 
-image = cv2.imread("input\\unknown.png")
-image2 = cv2.flip(image, 1)
 
-results = model.predict(source=[image, image2], conf=0.59, classes=0, verbose=False, device=0)[0].cpu()
+if __name__ == "__main__":
+    # Create the video capture object (replace '0' with the appropriate video source)
+    cap = cv2.VideoCapture(0, cv2.CAP_MSMF)
 
-mask1 = results.masks.data[0].numpy()
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-cv2.imshow("Mask1", mask1)
+    while True:
+        # Measure the processing time of the function
+        start_time = time.time()
 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+        # Read a frame from the video stream
+        ret, frame = cap.read()
+        if not ret:
+            break
 
+        cv2.imshow('Processed Frame', frame)
+        cv2.waitKey(5)
+
+        diff = time.time() - start_time
+        print("Time taken: {:.2f} seconds".format(diff))
+        print("FPS: {:.2f}".format(1 / diff))
+
+    # Release the video capture object and close the windows
+    cap.release()
+    cv2.destroyAllWindows()
