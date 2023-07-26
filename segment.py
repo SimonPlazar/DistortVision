@@ -21,14 +21,11 @@ while True:
 
     start = time.time()
     results = model.predict(source=frame, conf=0.59, classes=0, verbose=False)[0].masks
-    mask = results.data[0].numpy()
+    mask = (results.data[0].numpy() * 255).astype(np.uint8)
     print("Time taken: {:.2f} seconds".format(time.time() - start))
 
     cv2.imshow("Frame", frame)
     cv2.imshow("Mask", mask)
-
-    print(frame.shape)
-    print(mask.shape)
 
     # Exit the loop when 'q' key is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):

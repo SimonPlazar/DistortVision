@@ -9,11 +9,6 @@ def compress_and_overlay(image, mask, quality):
     # Create a mask slightly larger than the input mask
     dilated_mask = cv2.dilate(mask, None, iterations=5)
 
-    print(dilated_mask.shape)
-    print(dilated_mask.dtype)
-    print(image.shape)
-    print(image.dtype)
-
     # Extract the area defined by the input mask from the original image
     extracted = cv2.bitwise_and(image, image, mask=dilated_mask)
 
@@ -38,9 +33,6 @@ if __name__ == "__main__":
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps_num = cap.get(cv2.CAP_PROP_FPS)
-
-    print(fps_num)
 
     # Create a binary square mask (you can change this according to your needs)
     # mask = np.zeros((height, width), np.uint8)
@@ -60,8 +52,8 @@ if __name__ == "__main__":
         # Measure the processing time of the function
         start_time = time.time()
 
-        results = model.predict(source=frame, conf=0.59, classes=0, verbose=False)[0].masks
-        mask = np.repeat(results.data[0].numpy().reshape((height, width, 1)), 3, axis=-1).astype(np.uint8)
+        results = model.predict(source=frame, conf=0.59, classes=0, verbose=False, save_txt=True)[0].masks.data
+        mask = (results[0].numpy() * 255).astype(np.uint8)
 
         frame = compress_and_overlay(frame, mask, 5)
         print("Time taken: {:.2f} seconds".format(time.time() - start_time))
