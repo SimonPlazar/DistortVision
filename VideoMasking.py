@@ -44,19 +44,21 @@ if __name__ == "__main__":
     fps = 0
 
     while True:
+        # Measure the processing time of the function
+        start_time = time.time()
+
         # Read a frame from the video stream
         ret, frame = cap.read()
         if not ret:
             break
 
-        # Measure the processing time of the function
-        start_time = time.time()
+        results = model.predict(source=frame, conf=0.59, classes=0, verbose=False)[0].masks
+        if results is None: # If no mask is found, display normal frame!!
+            continue
 
-        results = model.predict(source=frame, conf=0.59, classes=0, verbose=False, save_txt=True)[0].masks.data
-        mask = (results[0].numpy() * 255).astype(np.uint8)
+        mask = np.multiply(results.data[0].numpy(), 255).astype(np.uint8)
 
-        frame = compress_and_overlay(frame, mask, 5)
-        print("Time taken: {:.2f} seconds".format(time.time() - start_time))
+        frame = compress_and_overlay(frame, mask, 3)
 
         # Calculate and display FPS
         frame_counter += 1
@@ -68,6 +70,8 @@ if __name__ == "__main__":
         # Display the processed frame with FPS information
         cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.imshow('Processed Frame', frame)
+
+        print("Time taken: {:.2f} seconds".format(time.time() - start_time))
 
         # Exit the loop when 'q' key is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
