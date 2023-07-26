@@ -4,12 +4,18 @@ import time
 
 from ultralytics import YOLO
 
+def get_squere_mask(width, height):
+    # Create a binary square mask (you can change this according to your needs)
+    mask = np.zeros((height, width), np.uint8)
+    x, y, w, h = width // 4, height // 4, width // 2, height // 2
+    mask[y:y + h, x:x + w] = 255
+    return mask
 
 def compress_and_overlay(image, mask, quality):
     # Create a mask slightly larger than the input mask
     dilated_mask = cv2.dilate(mask, None, iterations=5)
 
-    # Extract the area defined by the input mask from the original image
+    # Extract the area defined by the larger mask from the original image
     extracted = cv2.bitwise_and(image, image, mask=dilated_mask)
 
     # Compress the extracted area
@@ -18,7 +24,7 @@ def compress_and_overlay(image, mask, quality):
     extracted = cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
 
     # Replace the pixels in the original image with those from 'extracted',
-    # but only for the pixels within the input mask.
+    # but only for the pixels within the smaller mask.
     image[np.where(mask == 255)] = extracted[np.where(mask == 255)]
 
     return image
@@ -31,14 +37,11 @@ if __name__ == "__main__":
     # Create the video capture object (replace '0' with the appropriate video source)
     cap = cv2.VideoCapture(0)
 
+    # Get the width and height of the video stream
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    # Create a binary square mask (you can change this according to your needs)
-    # mask = np.zeros((height, width), np.uint8)
-    # x, y, w, h = width // 4, height // 4, width // 2, height // 2
-    # mask[y:y + h, x:x + w] = 255
-
+    # Time and FPS variables
     start_time_fps = time.time()
     frame_counter = 0
     fps = 0
@@ -52,15 +55,16 @@ if __name__ == "__main__":
         if not ret:
             break
 
+        # Get the masks from the model
         results = model.predict(source=frame, conf=0.59, classes=0, verbose=False)[0].masks
 
-        if results is not None: # If no mask is found, display normal frame!!
-            mask = np.multiply(results.data[0].numpy(), 255).astype(np.uint8) # first mask
-            for i in range(1, results.data.shape[0]):
-                mask = np.bitwise_or(mask, np.multiply(results.data[i].numpy(), 255).astype(np.uint8))
 
-            # frame = compress_and_overlay(frame, mask, 3)
+        if results is not None: # If a mask is found
+            mask = np.multiply(results.data[0].numpy(), 255).astype(np.uint8) # First mask
+            for i in range(1, results.data.shape[0]): # For each other mask
+                mask = np.bitwise_or(mask, np.multiply(results.data[i].numpy(), 255).astype(np.uint8)) # Combine the masks
 
+            # Function code below; frame = compress_and_overlay(frame, mask, 3)
             dilated_mask = cv2.dilate(mask, None, iterations=5)
             extracted = cv2.bitwise_and(frame, frame, mask=dilated_mask)
 
@@ -69,10 +73,10 @@ if __name__ == "__main__":
 
             frame[np.where(mask == 255)] = extracted[np.where(mask == 255)]
 
-        else:
-            cv2.putText(frame, "No mask found", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        else: # If no mask is found
+            cv2.putText(frame, "No mask found", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2) # Display a message
 
-        # Calculate and display FPS
+        # Calculate the FPS
         frame_counter += 1
         if (time.time() - start_time_fps) > 1:
             fps = frame_counter / (time.time() - start_time_fps)
