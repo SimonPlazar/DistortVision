@@ -8,25 +8,22 @@ from ultralytics import YOLO
 model = YOLO("dnn\\yolov8s-seg.pt")
 
 image = cv2.imread("input\\unknown.png")
+image2 = cv2.flip(image, 1)
 
-results = model.predict(source=image, conf=0.59, classes=0, verbose=False)[0].masks
+results = model.predict(source=[image, image2], conf=0.59, classes=0, verbose=False)
 
-mask_count = results.data.shape[1]
+mask1 = results[0].masks.data[0].numpy()
+mask2 = results[1].masks.data[0].numpy()
 
-for i in range(mask_count):
-    mask = results.data[i].numpy()
+both = cv2.bitwise_or(mask1, mask2)
 
-    cv2.imshow("Mask", mask)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+# mask_count = results.data.shape[1]
+# mask = results.data[0].numpy()
 
-    print(image.shape)
-    print(mask.shape)
+cv2.imshow("Mask1", mask1)
+cv2.imshow("Mask2", mask2)
+cv2.imshow("Both", both)
 
-    np.repeat(results.data[0].numpy().reshape((height, width, 1)), 3, axis=-1).astype(np.uint8)
-
-    extracted = cv2.bitwise_and(image, image, mask=mask)
-    cv2.imshow("extracted", extracted)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 

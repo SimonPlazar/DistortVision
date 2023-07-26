@@ -53,12 +53,24 @@ if __name__ == "__main__":
             break
 
         results = model.predict(source=frame, conf=0.59, classes=0, verbose=False)[0].masks
-        if results is None: # If no mask is found, display normal frame!!
-            continue
 
-        mask = np.multiply(results.data[0].numpy(), 255).astype(np.uint8)
+        if results is not None: # If no mask is found, display normal frame!!
+            mask = np.multiply(results.data[0].numpy(), 255).astype(np.uint8) # first mask
+            for i in range(1, results.data.shape[0]):
+                mask = np.bitwise_or(mask, np.multiply(results.data[i].numpy(), 255).astype(np.uint8))
 
-        frame = compress_and_overlay(frame, mask, 3)
+            # frame = compress_and_overlay(frame, mask, 3)
+
+            dilated_mask = cv2.dilate(mask, None, iterations=5)
+            extracted = cv2.bitwise_and(frame, frame, mask=dilated_mask)
+
+            _, compressed_image = cv2.imencode(".jpg", extracted, [int(cv2.IMWRITE_JPEG_QUALITY), 3])
+            extracted = cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
+
+            frame[np.where(mask == 255)] = extracted[np.where(mask == 255)]
+
+        else:
+            cv2.putText(frame, "No mask found", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
         # Calculate and display FPS
         frame_counter += 1
