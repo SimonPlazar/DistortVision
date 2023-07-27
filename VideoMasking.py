@@ -41,8 +41,8 @@ if __name__ == "__main__":
     # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
     # Get the width and height of the video stream
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -63,7 +63,7 @@ if __name__ == "__main__":
             break
 
         # Get the masks from the model
-        results = model.predict(source=frame, conf=0.59, classes=0, verbose=False, device=0)[0].masks
+        results = model.predict(source=frame, conf=0.59, classes=0, verbose=False, device=0, retina_masks=True)[0].masks
 
         if results is not None: # If a mask is found
             # mask = np.multiply(results.data[0].numpy(), 255).astype(np.uint8) # First mask
@@ -71,17 +71,25 @@ if __name__ == "__main__":
 
             for i in range(1, results.data.shape[0]): # For each other mask
                 #mask = np.bitwise_or(mask, np.multiply(results.data[i].numpy(), 255).astype(np.uint8)) # Combine the masks
-                mask = torch.bitwise_or(mask, (results.data[0] * 255).to(torch.uint8)) # Combine the masks
+                mask = torch.bitwise_or(mask, (results.data[i] * 255).to(torch.uint8)) # Combine the masks
 
+            # Pass the mask to cpu memory
             mask = mask.cpu().numpy()
-            # Function code below; frame = compress_and_overlay(frame, mask, 3)
+
+            # Resize the mask to the video stream size
+            if mask.shape[0] != height or mask.shape[1] != width:
+                mask = cv2.resize(mask, (width, height), interpolation=cv2.INTER_NEAREST)
+
+            # Create dilated mask and extract the area defined by the mask from the original image
             dilated_mask = cv2.dilate(mask, None, iterations=5)
             extracted = cv2.bitwise_and(frame, frame, mask=dilated_mask)
 
+            # Alter extracted image
             extracted = cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV)
             _, compressed_image = cv2.imencode(".jpg", extracted, [int(cv2.IMWRITE_JPEG_QUALITY), 10])
             extracted = cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
 
+            # Replace the pixels in the original image with those from 'extracted',
             frame[np.where(mask == 255)] = extracted[np.where(mask == 255)]
 
         else: # If no mask is found
