@@ -23,7 +23,6 @@ def compress_and_overlay(image, mask, quality):
 
     return image_copy
 
-
 # Example usage:
 if __name__ == "__main__":
     # Read the image

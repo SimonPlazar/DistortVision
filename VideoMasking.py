@@ -37,12 +37,13 @@ if __name__ == "__main__":
 
     # Create the video capture object (replace '0' with the appropriate video source)
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-
+    # cap = cv2.VideoCapture(0)
+    #
     # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    #
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
     # Get the width and height of the video stream
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -84,9 +85,12 @@ if __name__ == "__main__":
             dilated_mask = cv2.dilate(mask, None, iterations=5)
             extracted = cv2.bitwise_and(frame, frame, mask=dilated_mask)
 
+            # Pink
+            # extracted = np.full((height, width, 3), (203,192,255), dtype=np.uint8)
+
             # Alter extracted image
-            extracted = cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV)
-            _, compressed_image = cv2.imencode(".jpg", extracted, [int(cv2.IMWRITE_JPEG_QUALITY), 10])
+            # extracted = cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV)
+            _, compressed_image = cv2.imencode(".jpg", extracted, [int(cv2.IMWRITE_JPEG_QUALITY), 6])
             extracted = cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
 
             # Replace the pixels in the original image with those from 'extracted',
