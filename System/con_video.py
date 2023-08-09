@@ -43,10 +43,7 @@ def thread_frames():
                     # if (np.shape(frame_temp)[0] == 6220800):
                     if (np.shape(frame_temp)[0] != 0):
                         # frame = frame_temp.reshape((480, 640, 3))
-                        # frame = frame_temp.reshape((1080, 1920, 3))
-                        frame = frame_temp.reshape((720, 1280, 3))
-                        # frame = frame_temp.reshape((480, 640, 3))
-                        # frame = frame_temp.reshape((1080, 1920, 3))
+                    #     frame = frame_temp.reshape((1080, 1920, 3))
                         frame = frame_temp.reshape((720, 1280, 3))
 
 

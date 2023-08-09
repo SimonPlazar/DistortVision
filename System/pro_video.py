@@ -12,6 +12,7 @@ def thread_produce():
 
     vc = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
+    vc.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('m', 'j', 'p', 'g'))
     vc.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     # vc.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     # vc.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
