@@ -35,12 +35,20 @@ if __name__ == "__main__":
     # Load the model
     model = YOLO("dnn\\yolov8x-seg.pt")
 
-    # Create the video capture object (replace '0' with the appropriate video source)
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     # cap = cv2.VideoCapture(0)
+
+    # MAGIC!!!
+    # cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m', 'j', 'p', 'g'))
+    # cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M', 'J', 'P', 'G'))
     #
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('x', 'v', 'i', 'd'))
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('X', 'V', 'I', 'D'))
+    cap.set(cv2.CAP_PROP_FPS, 30.0)
+
+
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     #
     # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -65,6 +73,7 @@ if __name__ == "__main__":
 
         # Get the masks from the model
         results = model.predict(source=frame, conf=0.59, classes=0, verbose=False, device=0, retina_masks=True)[0].masks
+        # results = model.predict(source=cv2.resize(frame, (640, 480)), conf=0.59, classes=0, verbose=False, device=0, retina_masks=True)[0].masks
 
         if results is not None: # If a mask is found
             # mask = np.multiply(results.data[0].numpy(), 255).astype(np.uint8) # First mask
