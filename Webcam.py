@@ -3,8 +3,8 @@ import cvzone
 
 capture = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
-capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('m', 'j', 'p', 'g'))
-capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m', 'j', 'p', 'g'))
+capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M', 'J', 'P', 'G'))
 
 capture.set(cv2.CAP_PROP_FPS, 60)
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
