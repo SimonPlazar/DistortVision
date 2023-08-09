@@ -1,5 +1,3 @@
-import time
-
 import numpy as np
 import cv2
 import threading
@@ -7,6 +5,7 @@ import redis
 import kafka
 import signal
 from datetime import datetime
+import cvzone
 
 def thread_frames():
     # Redis
@@ -21,9 +20,7 @@ def thread_frames():
                                    group_id='grp_visualization', consumer_timeout_ms=2000)
     consumer.subscribe([topic])
 
-    # Initialize FPS calculation variables
-    start_time = time.time()
-    frame_count = 0
+    fpsReader = cvzone.FPS()
 
     while True:
         # Read from Redis when message is received over Kafka
@@ -43,19 +40,14 @@ def thread_frames():
                     # if (np.shape(frame_temp)[0] == 6220800):
                     if (np.shape(frame_temp)[0] != 0):
                         # frame = frame_temp.reshape((480, 640, 3))
-                    #     frame = frame_temp.reshape((1080, 1920, 3))
-                        frame = frame_temp.reshape((720, 1280, 3))
+                        frame = frame_temp.reshape((1080, 1920, 3))
+                        # frame = frame_temp.reshape((720, 1280, 3))
 
 
                     # Display image
+                    fpsReader.update(frame, pos=(50, 80), color=(0, 255, 0), scale=5, thickness=5)
                     cv2.imshow("frame", frame)
                     cv2.waitKey(1)
-
-                    # Calculate FPS
-                    frame_count += 1
-                    elapsed_time = time.time() - start_time
-                    fps = frame_count / elapsed_time
-                    print("FPS: " + str(fps))
 
 
             if event.is_set():
