@@ -39,14 +39,10 @@ if __name__ == "__main__":
     # cap = cv2.VideoCapture(0)
 
     # MAGIC!!!
-    # cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m', 'j', 'p', 'g'))
-    # cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M', 'J', 'P', 'G'))
-    #
-    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('x', 'v', 'i', 'd'))
-    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('X', 'V', 'I', 'D'))
-    cap.set(cv2.CAP_PROP_FPS, 30.0)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m', 'j', 'p', 'g'))
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M', 'J', 'P', 'G'))
 
-
+    cap.set(cv2.CAP_PROP_FPS, 60.0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     #
