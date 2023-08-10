@@ -32,7 +32,6 @@ Before using the app, ensure you have the following prerequisites installed:
 - opencv-python==4.8.0.74
 - cvzone==1.5.6
 - numpy==1.24.3
-- torch==2.0.1+cu117
 - ultralytics==8.0.142
 - Pillow==8.4.0
 
@@ -40,6 +39,14 @@ You can install the required packages using the following command:
 
 ```bash
 pip install -r requirements.txt
+```
+
+#### PyTorch and TorchVision
+
+The YOLO model requires PyTorch and TorchVision to be installed. You can install them using the following command:
+
+```bash
+pip3 install torch==2.0.1+cu118 torchvision==0.15.2+cu118 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 #### Downloading Pretrained Weights
