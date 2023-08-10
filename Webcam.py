@@ -3,7 +3,17 @@ import cvzone
 import numpy as np
 import torch
 from ultralytics import YOLO
-from PIL import Image, ImageFilter
+from PIL import Image
+
+def censoring(extracted):
+    image = Image.fromarray(cv2.cvtColor(cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV), cv2.COLOR_BGR2RGB))
+    pixilated = image.resize((image.width // 7, image.height // 7), resample=Image.NEAREST)
+    pixilated = pixilated.resize(image.size, resample=Image.NEAREST)
+    return cv2.cvtColor(np.array(pixilated), cv2.COLOR_RGB2BGR)
+
+def jpeg_artifact(extracted):
+    _, compressed_image = cv2.imencode(".jpg", cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV), [int(cv2.IMWRITE_JPEG_QUALITY), 6])
+    return cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
 
 # Load the model
 model = YOLO("dnn\\yolov8l-seg.pt")
@@ -25,6 +35,8 @@ fpsReader = cvzone.FPS()
 while True:
     ret, frame = capture.read()
 
+    frame = cv2.flip(frame, 1)
+
     # Get the masks from the model
     results = model.predict(source=frame, conf=0.59, classes=0, verbose=False, device=0, retina_masks=True)[0].masks
 
@@ -45,19 +57,15 @@ while True:
         dilated_mask = cv2.dilate(mask, None, iterations=5)
         extracted = cv2.bitwise_and(frame, frame, mask=dilated_mask)
 
-        # Colorspace shange
+        # Colorspace change
         # extracted = np.full((height, width, 3), (203,192,255), dtype=np.uint8) # Pink
-        extracted = cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV) # Convert to HSV
+        # extracted = cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV) # Convert to HSV
 
         # Jpeg artifact effect
-        # _, compressed_image = cv2.imencode(".jpg", extracted, [int(cv2.IMWRITE_JPEG_QUALITY), 6])
-        # extracted = cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
+        # extracted = jpeg_artifact(extracted)
 
         # Pixelated effect (censoring effect)
-        image = Image.fromarray(cv2.cvtColor(extracted, cv2.COLOR_BGR2RGB))
-        pixilated = image.resize((image.width // 7, image.height // 7), resample=Image.NEAREST)
-        pixilated = pixilated.resize(image.size, resample=Image.NEAREST)
-        extracted = cv2.cvtColor(np.array(pixilated), cv2.COLOR_RGB2BGR)
+        extracted = censoring(extracted)
 
         # Use bitwise operations to replace the pixels in the original image
         roi = cv2.bitwise_and(extracted, extracted, mask=mask)
