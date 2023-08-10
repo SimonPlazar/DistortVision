@@ -8,6 +8,7 @@ from tkinter import ttk
 from ultralytics import YOLO
 from PIL import Image
 
+
 def get_device_id_by_name(device_name):
     if device_name == 'CPU':
         return "cpu"
@@ -17,6 +18,8 @@ def get_device_id_by_name(device_name):
             return i
 
     return None  # Return None if the device name is not found
+
+
 class VideoProcessingApp:
     def __init__(self, root):
         self.root = root
@@ -50,7 +53,8 @@ class VideoProcessingApp:
         distortion_label.pack(pady=10)
 
         self.distortion_var = tk.StringVar()
-        self.distortion_combobox = ttk.Combobox(self.root, textvariable=self.distortion_var, values=self.distortion_options)
+        self.distortion_combobox = ttk.Combobox(self.root, textvariable=self.distortion_var,
+                                                values=self.distortion_options)
         self.distortion_combobox.pack()
 
         # YOLO Weights Selection
@@ -83,7 +87,8 @@ class VideoProcessingApp:
         self.weights_combobox['values'] = available_weights
 
     def apply_settings(self):
-        if not bool(self.resolution_var.get()) or not bool(self.device_var.get()) or not bool(self.distortion_var.get()) or not bool(self.weights_var.get()):
+        if not bool(self.resolution_var.get()) or not bool(self.device_var.get()) or not bool(
+                self.distortion_var.get()) or not bool(self.weights_var.get()):
             print("Error: Not all settings selected")
             return
 
@@ -95,7 +100,8 @@ app = VideoProcessingApp(root)
 root.geometry("300x330")  # Set window size
 root.mainloop()
 
-if not bool(app.resolution_var.get()) or not bool(app.device_var.get()) or not bool(app.distortion_var.get()) or not bool(app.weights_var.get()):
+if not bool(app.resolution_var.get()) or not bool(app.device_var.get()) or not bool(
+        app.distortion_var.get()) or not bool(app.weights_var.get()):
     exit(0)
 
 width, height = app.resolution_var.get().split('x')
@@ -104,6 +110,7 @@ width, height = int(width), int(height)
 device_id = get_device_id_by_name(app.device_var.get())
 
 path_to_weights = app.weights_var.get()
+
 
 # DEBUG PRINTS
 # print("Resolution: {} x {}".format(width, height))
@@ -117,9 +124,12 @@ def censoring(extracted):
     pixilated = pixilated.resize(image.size, resample=Image.NEAREST)
     return cv2.cvtColor(np.array(pixilated), cv2.COLOR_RGB2BGR)
 
+
 def jpeg_artifact(extracted):
-    _, compressed_image = cv2.imencode(".jpg", cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV), [int(cv2.IMWRITE_JPEG_QUALITY), 6])
+    _, compressed_image = cv2.imencode(".jpg", cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV),
+                                       [int(cv2.IMWRITE_JPEG_QUALITY), 6])
     return cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
+
 
 # Load the model
 model = YOLO(path_to_weights)
@@ -147,7 +157,8 @@ while True:
 
     if not none:
         # Get the masks from the model
-        results = model.predict(source=frame, conf=0.59, classes=0, verbose=False, device=device_id, retina_masks=True)[0].masks
+        results = model.predict(source=frame, conf=0.59, classes=0, verbose=False, device=device_id, retina_masks=True)[
+            0].masks
 
         if results is not None:  # If a mask is found
             mask = (results.data[0] * 255).to(torch.uint8)
@@ -179,8 +190,9 @@ while True:
             background = cv2.bitwise_and(frame, frame, mask=inverse_mask)
 
             frame = cv2.add(background, roi)
-        else: # If no mask is found
-            cv2.putText(frame, "No mask found", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2) # Display a message
+        else:  # If no mask is found
+            cv2.putText(frame, "No mask found", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255),
+                        2)  # Display a message
 
     fpsReader.update(frame, pos=(50, 80), color=(0, 255, 0), scale=5, thickness=5)
     cv2.imshow('Video', frame)
