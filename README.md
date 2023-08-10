@@ -19,9 +19,9 @@ The Video Processing App is a graphical user interface (GUI) application built u
 ## Features
 
 - Real-time video processing and distortion.
-- Instance segmentation using YOLO model.
+- Object detection using YOLO model.
 - Multiple distortion options including pixelation, JPEG artifact, and more.
-- Adjustable video resolution, torch device selection and more.
+- Adjustable video resolution and torch device selection.
 
 ## Getting Started
 
@@ -30,17 +30,29 @@ The Video Processing App is a graphical user interface (GUI) application built u
 Before using the app, ensure you have the following prerequisites installed:
 
 - Python (>= 3.6)
-- OpenCV (cv2)
-- tkinter
-- torch
-- ultralytics (YOLO library)
-- numpy
-- PIL
+- opencv-python==4.8.0.74
+- cvzone==1.5.6
+- numpy==1.24.3
+- torch==2.0.1+cu117
+- ultralytics==8.0.142
+- Pillow==8.4.0
 
 You can install the required packages using the following command:
 
 ```bash
-pip install opencv-python tkinter torch ultralytics numpy pillow
+pip install -r requirements.txt
+```
+
+where the `requirements.txt` file contains the following lines:
+
+```
+future==0.18.3
+opencv-python==4.8.0.74
+cvzone==1.5.6
+numpy==1.24.3
+torch==2.0.1+cu117
+ultralytics==8.0.142
+Pillow==8.4.0
 ```
 
 ### Installation
@@ -81,6 +93,10 @@ python app.py
 
 Contributions are welcome! If you find any bugs or want to improve the app, feel free to create issues or pull requests.
 
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
 ## Contact
 
-If you have any questions or suggestions, please feel free to contact [Simon Plazar](mailto:simon.plazar@gmail.com).
+If you have any questions or suggestions, please feel free to contact [Your Name](mailto:your.email@example.com).
