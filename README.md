@@ -1,5 +1,4 @@
 # Video Processing App
-
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
@@ -9,7 +8,6 @@
 - [Usage](#usage)
 - [Distortion Options](#distortion-options)
 - [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
 
 ## Introduction
@@ -27,6 +25,7 @@ The Video Processing App is a graphical user interface (GUI) application built u
 
 ### Prerequisites
 
+#### Installing Required Packages
 Before using the app, ensure you have the following prerequisites installed:
 
 - Python (>= 3.6)
@@ -43,17 +42,21 @@ You can install the required packages using the following command:
 pip install -r requirements.txt
 ```
 
-where the `requirements.txt` file contains the following lines:
+#### Downloading Pretrained Weights
 
-```
-future==0.18.3
-opencv-python==4.8.0.74
-cvzone==1.5.6
-numpy==1.24.3
-torch==2.0.1+cu117
-ultralytics==8.0.142
-Pillow==8.4.0
-```
+To use the YOLO model for instance segmentation, you need to download pretrained weights. You can download the YOLOv8 weights from the official Ultralytics website:
+
+- [YOLOv8 Weights](https://docs.ultralytics.com/tasks/segment/#models)
+
+After downloading the weights, place the downloaded `.pt` file in the `weights` directory in the root of this repository.
+
+#### Using Custom Weights
+
+If you have your own YOLO weights that you want to use, make sure they are in the correct format (`.pt` or `.pth` files) and place them in the `weights` directory. 
+If you did everything correctly, you should be able to see your custom weights in the app's GUI by default.
+
+For more information on using YOLO weights and the Ultralytics library, refer to the [Ultralytics YOLO Documentation](https://docs.ultralytics.com/).
+
 
 ### Installation
 
@@ -72,7 +75,7 @@ cd video-processing-app
 3. Run the application:
 
 ```bash
-python app.py
+python GuiApp.py
 ```
 
 ## Usage
@@ -93,10 +96,6 @@ python app.py
 
 Contributions are welcome! If you find any bugs or want to improve the app, feel free to create issues or pull requests.
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
 ## Contact
 
-If you have any questions or suggestions, please feel free to contact [Your Name](mailto:your.email@example.com).
+If you have any questions or suggestions, please feel free to contact [Simon Plazar](mailto:simon.plazar@gmail.com).
