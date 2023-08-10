@@ -22,8 +22,7 @@ class VideoProcessingApp:
         self.root = root
         self.root.title("Video Processing GUI")
 
-        # self.weights = ["yolov8n-seg.pt", "yolov8s-seg.pt", "yolov8m-seg.pt", "yolov8l-seg.pt", "yolov8x-seg.pt"]
-        self.resolutions = ["1920x1080", "1280x720", "854x480", "640x360"]
+        self.resolutions = ["1920x1080", "1280x720", "640x360"]
         self.distortion_options = ["None", "Jpeg", "Censoring", "Pink"]
 
         self.create_widgets()
@@ -76,7 +75,7 @@ class VideoProcessingApp:
 
     def update_weights_options(self):
         available_weights = []
-        for root, dirs, files in os.walk("dnn"):
+        for root, dirs, files in os.walk("weights"):
             for file in files:
                 if file.endswith(".pt") or file.endswith(".pth"):
                     available_weights.append(os.path.join(root, file))
@@ -106,10 +105,11 @@ device_id = get_device_id_by_name(app.device_var.get())
 
 path_to_weights = app.weights_var.get()
 
-print("Resolution: {} x {}".format(width, height))
-print("Device: {} ({})".format(app.device_var.get(), device_id))
-print("Distortion: {}".format(app.distortion_var.get()))
-print("Path to Weights: {}".format(path_to_weights))
+# DEBUG PRINTS
+# print("Resolution: {} x {}".format(width, height))
+# print("Device: {} ({})".format(app.device_var.get(), device_id))
+# print("Distortion: {}".format(app.distortion_var.get()))
+# print("Path to Weights: {}".format(path_to_weights))
 
 def censoring(extracted):
     image = Image.fromarray(cv2.cvtColor(cv2.cvtColor(extracted, cv2.COLOR_BGR2HSV), cv2.COLOR_BGR2RGB))

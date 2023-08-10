@@ -236,8 +236,13 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+
+
+# Personal ignores
 /output/
 /input/
-/ssd_mobilenet_v2_320x320_coco17_tpu-8/
-/dnn/
-/Old Code/
+/weights/yolov8l-seg.pt
+/weights/yolov8m-seg.pt
+/weights/yolov8n-seg.pt
+/weights/yolov8s-seg.pt
+/weights/yolov8x-seg.pt
