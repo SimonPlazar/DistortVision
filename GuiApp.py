@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 import cv2
 import cvzone
@@ -21,7 +22,7 @@ class VideoProcessingApp:
         self.root = root
         self.root.title("Video Processing GUI")
 
-        self.weights = ["yolov8n-seg.pt", "yolov8s-seg.pt", "yolov8m-seg.pt", "yolov8l-seg.pt", "yolov8x-seg.pt"]
+        # self.weights = ["yolov8n-seg.pt", "yolov8s-seg.pt", "yolov8m-seg.pt", "yolov8l-seg.pt", "yolov8x-seg.pt"]
         self.resolutions = ["1920x1080", "1280x720", "854x480", "640x360"]
         self.distortion_options = ["None", "Jpeg", "Censoring", "Pink"]
 
@@ -58,7 +59,8 @@ class VideoProcessingApp:
         weights_label.pack(pady=10)
 
         self.weights_var = tk.StringVar()
-        self.weights_combobox = ttk.Combobox(self.root, textvariable=self.weights_var, values=self.weights)
+        self.weights_combobox = ttk.Combobox(self.root, textvariable=self.weights_var)
+        self.update_weights_options()
         self.weights_combobox.pack()
 
         # Apply Button
@@ -72,8 +74,17 @@ class VideoProcessingApp:
 
         self.device_combobox['values'] = available_devices
 
+    def update_weights_options(self):
+        available_weights = []
+        for root, dirs, files in os.walk("dnn"):
+            for file in files:
+                if file.endswith(".pt") or file.endswith(".pth"):
+                    available_weights.append(os.path.join(root, file))
+
+        self.weights_combobox['values'] = available_weights
+
     def apply_settings(self):
-        if not bool(self.resolution_var.get()) or not bool(self.device_var.get()) or not bool(self.distortion_var.get()):
+        if not bool(self.resolution_var.get()) or not bool(self.device_var.get()) or not bool(self.distortion_var.get()) or not bool(self.weights_var.get()):
             print("Error: Not all settings selected")
             return
 
@@ -85,7 +96,7 @@ app = VideoProcessingApp(root)
 root.geometry("300x330")  # Set window size
 root.mainloop()
 
-if not bool(app.resolution_var.get()) or not bool(app.device_var.get()) or not bool(app.distortion_var.get()):
+if not bool(app.resolution_var.get()) or not bool(app.device_var.get()) or not bool(app.distortion_var.get()) or not bool(app.weights_var.get()):
     exit(0)
 
 width, height = app.resolution_var.get().split('x')
@@ -93,7 +104,7 @@ width, height = int(width), int(height)
 
 device_id = get_device_id_by_name(app.device_var.get())
 
-path_to_weights = "dnn\\" + app.weights_var.get()
+path_to_weights = app.weights_var.get()
 
 print("Resolution: {} x {}".format(width, height))
 print("Device: {} ({})".format(app.device_var.get(), device_id))
