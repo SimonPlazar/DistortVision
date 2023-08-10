@@ -1,4 +1,4 @@
-# Video Processing App
+# Distort Vision Project
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
@@ -63,13 +63,13 @@ For more information on using YOLO weights and the Ultralytics library, refer to
 1. Clone this repository to your local machine using:
 
 ```bash
-git clone https://github.com/yourusername/video-processing-app.git
+git clone https://github.com/SimonPlazar/DistortVision.git
 ```
 
 2. Navigate to the cloned directory:
 
 ```bash
-cd video-processing-app
+cd DistortVision
 ```
 
 3. Run the application:
